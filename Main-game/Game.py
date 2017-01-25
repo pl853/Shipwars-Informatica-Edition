@@ -1,12 +1,10 @@
 import pygame
 import sys
 
+
 width = 1280
 heigth = 720
 size = (width, heigth)
-
-
-
 
 class Game:
     def __init__(self):
@@ -16,14 +14,14 @@ class Game:
         self.gameExit = False
         self.screen = pygame.display.set_mode((size))
         self.intro_game = IntroGame(self)
-        self.game_main = GameMain(self)
+        self.game_main = GameMain(self,self.turn)
         self.pause_menu = PauseMenu(self)
-        self.ship1 = Boats(heigth*0.040,width*0.512,30,133,"boat1",3,3,"battleship1.png")
-        self.ship2 = Boats(heigth*0.040,width*0.568,20,100,"boat2",3,3,"battleship2.png")
-        self.ship3 = Boats(heigth*0.040,width*0.465,20,100,"boat3",3,3,"battleship.png")
-        self.ship4 = Boats(heigth * 0.83, width * 0.465, 20, 100, "boat1", 3, 3, "battleship4.png")
-        self.ship5 = Boats(heigth * 0.784, width * 0.512, 30, 133, "boat2", 3, 3, "battleship5.png")
-        self.ship6 = Boats(heigth * 0.83, width * 0.568, 20, 100, "boat3", 3, 3, "battleship6.png")
+        self.ship1 = Boats(heigth*0.040,width*0.512,30,133,"boat1",3,3,"battleship1.png",self.turn)
+        self.ship2 = Boats(heigth*0.040,width*0.568,20,100,"boat2",3,3,"battleship2.png",self.turn)
+        self.ship3 = Boats(heigth*0.040,width*0.465,20,100,"boat3",3,3,"battleship.png",self.turn)
+        self.ship4 = Boats(heigth * 0.83, width * 0.465, 20, 100, "boat1", 3, 3, "battleship4.png",self.turn)
+        self.ship5 = Boats(heigth * 0.784, width * 0.512, 30, 133, "boat2", 3, 3, "battleship5.png",self.turn)
+        self.ship6 = Boats(heigth * 0.83, width * 0.568, 20, 100, "boat3", 3, 3, "battleship6.png",self.turn)
         self.state = self.intro_game
         self.events = []
 
@@ -44,7 +42,11 @@ class Game:
                 self.ship1.draw(self.screen)
                 self.ship2.draw(self.screen)
                 self.ship3.draw(self.screen)
-            elif self.turn.turn_number >= 1:
+            elif self.turn.turn_number == 1:
+                self.ship4.draw(self.screen)
+                self.ship5.draw(self.screen)
+                self.ship6.draw(self.screen)
+            elif self.turn.turn_number > 1:
                 self.ship1.draw(self.screen)
                 self.ship2.draw(self.screen)
                 self.ship3.draw(self.screen)
@@ -70,8 +72,9 @@ class Game:
                     quit()
 
 class Boats:
-    def __init__(self, lead_x, lead_y, w,h,naam,hp,armor, image):
+    def __init__(self, lead_x, lead_y, w,h,naam,hp,armor, image,turn):
         self.game = Game
+        self.turn = turn
         self.lead_x = lead_y
         self.lead_y = lead_x
         self.hp = hp
@@ -155,14 +158,16 @@ class IntroGame:
         if width/20 + 250 > mouse[0] > width/20 and heigth/1.38 + 50 > mouse[1] > heigth/1.38:
             screen.blit(self.previeuwgame, (width*0.4,heigth*0.5))
             screen.blit (self.hoover, [width/24,heigth/1.38])
-
+        if width/20 + 250 > mouse[0] > width/20 and heigth/1.2 + 50 > mouse[1] > heigth/1.2:
+            screen.blit (self.hoover, [width/24,heigth/1.2])
 
 class GameMain:
-    def __init__(self, game):
+    def __init__(self, game , turn):
+        self.button_test = False
         self.pause_menu = PauseMenu
         self.game = game
-        self.turn=Turn()
-        self.font = pygame.font.Font(None, 25)
+        self.turn= turn
+        self.font = pygame.font.Font(None,25)
         self.sides = pygame.image.load("sides.jpg")
         self.sides = pygame.transform.scale(self.sides, (size))
         self.bggame = pygame.image.load("bggame.jpg")
@@ -178,9 +183,21 @@ class GameMain:
         self.next_turn = pygame.image.load ("next.png")
         self.next_turn = pygame.transform.scale(self.next_turn,[250,70])
         self.emptyimage = pygame.image.load ("empty.png")
-        self.emptyimage = pygame.transform.scale(self.emptyimage,[30,30])
+        self.emptyimage = pygame.transform.scale(self.emptyimage,[35,35])
         self.redline = pygame.image.load("redline.png")
         self.redline = pygame.transform.scale(self.redline,[670,150])
+        self.ihealth = pygame.image.load("healthon.png")
+        self.ihealth = pygame.transform.scale(self.ihealth, [30, 30])
+        self.yes = pygame.image.load("yes.png")
+        self.yes = pygame.transform.scale(self.yes, [70,70])
+        self.no = pygame.image.load("no.png")
+        self.no = pygame.transform.scale(self.no, [70, 70])
+        self.boat1= pygame.image.load("battleship1.png")
+        self.boat1 = pygame.transform.scale(self.boat1,[30,133])
+        self.boat2 = pygame.image.load("battleship2.png")
+        self.boat2 = pygame.transform.scale(self.boat2, [30, 133])
+        self.boat3 = pygame.image.load("battleship.png")
+        self.boat3 = pygame.transform.scale(self.boat3, [30, 133])
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -189,16 +206,20 @@ class GameMain:
                 self.game.set_state(self.game.pause_menu)
 
     def draw(self, screen):
+        #standaard images----------------------------------------------------------------------------------------
         screen.blit(self.sides, [0, 0])
         screen.blit(self.bggame, [width * 0.25, heigth * 0.04])
         screen.blit(self.movebutton, (width*0.01, heigth*0.11))
         screen.blit(self.movebutton, (width * 0.01, heigth * 0.42))
         screen.blit(self.movebutton, (width * 0.01, heigth * 0.735))
+        screen.blit(self.boat1, (width*0.16, heigth*0.1))
+        screen.blit(self.boat2, (width * 0.16, heigth * 0.43))
+        screen.blit(self.boat3, (width * 0.16, heigth * 0.75))
         # menu button---------------------------------------------------------------------------------------------
         mouse_button_pressed(1200, 10, 50, 50, screen, self.pbutton,self.game.events,
                              lambda: self.game.set_state(self.game.pause_menu))
 
-        if self.turn.turn_number == 0:
+        if self.turn.turn_number%2 == 0:
             # rotate buttons------------------------------------------------------------------------------------------
             mouse_button_pressed(10, 10, 130, 50, screen, self.abutton,self.game.events,
                                  lambda: self.game.ship1.rotate(90))
@@ -207,36 +228,37 @@ class GameMain:
             mouse_button_pressed(10, 470, 130, 50, screen, self.abutton,self.game.events,
                                  lambda: self.game.ship1.rotate(90))
             # movement buttons ship1-----------------------------------------------------------------------------------
-            mouse_button_pressed(width*0.03, heigth*0.115, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width*0.03, heigth*0.115, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship1.move_down())
-            mouse_button_pressed(width * 0.03, heigth * 0.18, 40, 30, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.03, heigth * 0.18, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship1.move_up())
-            mouse_button_pressed(width * 0.05, heigth * 0.147, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.05, heigth * 0.147, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship1.move_right())
-            mouse_button_pressed(width * 0.01, heigth * 0.147, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.01, heigth * 0.147, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship1.move_left())
 
             # movement buttons ship2-----------------------------------------------------------------------------------
-            mouse_button_pressed(width * 0.03, heigth * 0.42, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.03, heigth * 0.42, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship2.move_down())
-            mouse_button_pressed(width * 0.03, heigth * 0.49, 40, 30, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.03, heigth * 0.49, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship2.move_up())
-            mouse_button_pressed(width * 0.05, heigth * 0.45, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.05, heigth * 0.45, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship2.move_right())
-            mouse_button_pressed(width * 0.01, heigth * 0.45, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.01, heigth * 0.45, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship2.move_left())
             #  ship 3 movement-------------------------------------------------------------------------------------------
 
-            mouse_button_pressed(width * 0.03, heigth * 0.737, 40, 20, screen, self.emptyimage,self.game.events,
-                                 lambda: self.game.ship1.move_down())
-            mouse_button_pressed(width * 0.03, heigth * 0.80, 40, 30, screen, self.emptyimage,self.game.events,
-                                 lambda: self.game.ship1.move_up())
-            mouse_button_pressed(width * 0.05, heigth * 0.763, 40, 20, screen, self.emptyimage,self.game.events,
-                                 lambda: self.game.ship1.move_right())
-            mouse_button_pressed(width * 0.01, heigth * 0.763, 40, 20, screen, self.emptyimage,self.game.events,
-                                 lambda: self.game.ship1.move_left())
+            mouse_button_pressed(width * 0.03, heigth * 0.737, 35, 35, screen, self.emptyimage,self.game.events,
+                                 lambda: self.game.ship3.move_down())
+            mouse_button_pressed(width * 0.03, heigth * 0.80, 35, 35, screen, self.emptyimage,self.game.events,
+                                 lambda: self.game.ship3.move_up())
+            mouse_button_pressed(width * 0.05, heigth * 0.763, 35, 35, screen, self.emptyimage,self.game.events,
+                                 lambda: self.game.ship3.move_right())
+            mouse_button_pressed(width * 0.01, heigth * 0.763, 35, 35, screen, self.emptyimage,self.game.events,
+                                 lambda: self.game.ship3.move_left())
 
-        if self.turn.turn_number == 1:
+        if self.turn.turn_number%2 == 1:
+
             # rotate buttons------------------------------------------------------------------------------------------
             mouse_button_pressed(10, 10, 130, 50, screen, self.abutton,self.game.events,
                                  lambda: self.game.ship4.rotate(90))
@@ -245,43 +267,85 @@ class GameMain:
             mouse_button_pressed(10, 470, 130, 50, screen, self.abutton,self.game.events,
                                  lambda: self.game.ship6.rotate(90))
             # movement buttons ship1-----------------------------------------------------------------------------------
-            mouse_button_pressed(width * 0.03, heigth * 0.115, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.03, heigth * 0.115, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship4.move_down())
-            mouse_button_pressed(width * 0.03, heigth * 0.18, 40, 30, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.03, heigth * 0.18, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship4.move_up())
-            mouse_button_pressed(width * 0.05, heigth * 0.147, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.05, heigth * 0.147, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship4.move_right())
-            mouse_button_pressed(width * 0.01, heigth * 0.147, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.01, heigth * 0.147, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship4.move_left())
 
             # movement buttons ship2-----------------------------------------------------------------------------------
-            mouse_button_pressed(width * 0.03, heigth * 0.42, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.03, heigth * 0.42, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship5.move_down())
-            mouse_button_pressed(width * 0.03, heigth * 0.49, 40, 30, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.03, heigth * 0.49, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship5.move_up())
-            mouse_button_pressed(width * 0.05, heigth * 0.45, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.05, heigth * 0.45, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship5.move_right())
-            mouse_button_pressed(width * 0.01, heigth * 0.45, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.01, heigth * 0.45, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship5.move_left())
             #  ship 3 movement-------------------------------------------------------------------------------------------
 
-            mouse_button_pressed(width * 0.03, heigth * 0.737, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.03, heigth * 0.737, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship6.move_down())
-            mouse_button_pressed(width * 0.03, heigth * 0.80, 40, 30, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.03, heigth * 0.80, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship6.move_up())
-            mouse_button_pressed(width * 0.05, heigth * 0.763, 40, 20, screen, self.emptyimage,self.game.events,
+            mouse_button_pressed(width * 0.05, heigth * 0.763, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship6.move_right())
-            mouse_button_pressed(width * 0.01, heigth * 0.763, 40, 20, screen, self.emptyimage,
+            mouse_button_pressed(width * 0.01, heigth * 0.763, 35, 35, screen, self.emptyimage,self.game.events,
                                  lambda: self.game.ship6.move_left())
 
         # next turn button-----------------------------------------------------------------------------------------
-        mouse_button_pressed(1000, 635, 170, 80, screen, self.next_turn,self.game.events,
-                             lambda: self.turn.update)
+        def next_turn_conf_true():
+            self.button_test = True
+        def next_turn_conf_false():
+            self.button_test = False
+
+        mouse_button_pressed(width * 0.8, heigth * 0.85,250,70,screen,self.next_turn,self.game.events,lambda: next_turn_conf_true())
+
+        if self.button_test and self.turn.turn_number < 2:
+            message_to_screen("are you sure you want to end your turn", screen, width * 0.5, heigth * 0.62, 30)
+            mouse_button_pressed(width * 0.425, heigth * 0.65, 70, 70, screen, self.yes, self.game.events,
+                             lambda: self.turn.update())
+            mouse_button_pressed(width * 0.425, heigth * 0.65, 70, 70, screen, self.yes, self.game.events,
+                             lambda: next_turn_conf_false())
+            mouse_button_pressed(width * 0.525, heigth * 0.65, 70, 70, screen, self.no, self.game.events,
+                             lambda: self.game.set_state(self.game.game_main))
+            mouse_button_pressed(width * 0.525, heigth * 0.65, 70, 70, screen, self.no, self.game.events,
+                             lambda: next_turn_conf_false())
+        elif self.button_test and self.turn.turn_number > 1:
+            message_to_screen("are you sure you want to end your turn", screen, width * 0.5, heigth * 0.48, 30)
+            mouse_button_pressed(width * 0.425, heigth * 0.5, 70, 70, screen, self.yes, self.game.events,
+                                     lambda: self.turn.update())
+            mouse_button_pressed(width * 0.425, heigth * 0.5, 70, 70, screen, self.yes, self.game.events,
+                                     lambda: next_turn_conf_false())
+            mouse_button_pressed(width * 0.525, heigth * 0.5, 70, 70, screen, self.no, self.game.events,
+                                     lambda: self.game.set_state(self.game.game_main))
+            mouse_button_pressed(width * 0.525, heigth * 0.5, 70, 70, screen, self.no, self.game.events,
+                                     lambda: next_turn_conf_false())
+
+
         # red placing line-----------------------------------------------------------------------------------------
         if self.turn.turn_number == 0:
             screen.blit(self.redline,(width * 0.25,heigth*0.089))
         elif self.turn.turn_number == 1:
             screen.blit(self.redline,(width*0.25,heigth*0.655))
+
+        # placing health button------------------------------------------------------------------------------------
+        screen.blit(self.ihealth,(width*0.13,heigth*0.03))
+        screen.blit(self.ihealth, (width * 0.155, heigth * 0.03))
+        screen.blit(self.ihealth, (width * 0.18, heigth * 0.03))
+        screen.blit(self.ihealth, (width * 0.205, heigth * 0.03))
+        #--------------------------------------------------------
+        screen.blit(self.ihealth, (width * 0.13, heigth * 0.35))
+        screen.blit(self.ihealth, (width * 0.155, heigth * 0.35))
+        screen.blit(self.ihealth, (width * 0.18, heigth * 0.35))
+        #--------------------------------------------------------
+        screen.blit(self.ihealth, (width * 0.13, heigth * 0.67))
+        screen.blit(self.ihealth, (width * 0.155, heigth * 0.67))
+        screen.blit(self.ihealth, (width * 0.18, heigth * 0.67))
+        #--------------------------------------------------------
 
 class PauseMenu:
     def __init__(self, game):
@@ -321,22 +385,28 @@ class PauseMenu:
 
 class Turn:
     def __init__(self):
-        self.font = pygame.font.Font(None, 25)
         self.turn_number = 0
         self.player = Player
+        self.flag_a=pygame.image.load("flag_a.png")
+        self.flag_a=pygame.transform.scale(self.flag_a,[80,60])
+        self.flag_r=pygame.image.load("flag_r.png")
+        self.flag_r = pygame.transform.scale(self.flag_r, [80,60])
 
     def update(self):
         self.turn_number += 1
 
     def draw(self,screen):
-        self.turn_text = self.font.render("current Turn: {}".format(self.turn_number),1,(255,255,255))
+        message_to_screen("current Turn:",screen,width*0.85,heigth*0.76,20)
         if self.turn_number == 0:
-            self.turn_text1 = self.font.render("Please place your ships player 1", 1, (255, 255, 255))
-            screen.blit(self.turn_text1, (350, 10))
+            screen.blit(self.flag_a,(width*0.7,heigth*0.435))
+            message_to_screen("Move your ships in position America!",screen,width/2.15,heigth/2.1,30)
         elif self.turn_number == 1:
-            self.turn_text1 = self.font.render("Please place your ships player 2", 1, (255, 255, 255))
-            screen.blit(self.turn_text1 ,(350,10))
-        screen.blit(self.turn_text, (750,10))
+            message_to_screen("Move your ships in position Russia!",screen,width/2.15,heigth/2.1,30)
+            screen.blit(self.flag_r, (width * 0.7, heigth *0.435))
+        elif self.turn_number %2 == 0:
+            screen.blit(self.flag_a, (width * 0.92, heigth *0.72))
+        elif self.turn_number %2 == 1:
+            screen.blit(self.flag_r, (width * 0.92, heigth *0.72))
 
 class Player:
     def __init__(self,player1,player2,score,winner):
@@ -353,11 +423,19 @@ def mouse_button_pressed(x, y, w, h, screen, image_original, events, action=None
             if event.type == pygame.MOUSEBUTTONUP and action != None:
                 action()
 
+def text_objects(text,font):
+    textSurface = font.render (text,True, (250,0,0))
+    return textSurface, textSurface.get_rect()
+
+def message_to_screen(text,screen,x,y,size):
+    largeText = pygame.font.Font("freesansbold.ttf",size)
+    textsuf , textrect = text_objects(text,largeText)
+    textrect.center = ((x),(y))
+    screen.blit(textsuf,textrect)
+
 def run():
     game = Game()
     game.loop_of_game()
-
-
 run()
 
 
@@ -430,7 +508,11 @@ def message_to_screen(text):
 
 
 
-
+        # message_to_screen("Are you sure you are done?", screen, width / 2.10, heigth / 2.0, 30)
+        # if width*0.8 + 250 > mouse[0] > width*0.8 and heigth*0.85 + 70 > mouse[1] > heigth*0.85:
+        #     for event in events:
+        #         if event.type == pygame.MOUSEBUTTONDOWN:
+        #             message_to_screen("Are you sure you are done?", screen, width / 2.10, heigth / 2.0, 30)
 """
 
 """
