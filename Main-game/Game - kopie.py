@@ -1,6 +1,5 @@
 import pygame
 import sys
-import random
 
 
 
@@ -17,7 +16,7 @@ class Game:
         self.cards= Cards (self,self.turn)
         self.screen = pygame.display.set_mode((size))
         self.intro_game = IntroGame(self)
-        self.game_main = GameMain(self,self.turn,self.cards)
+        self.game_main = GameMain(self,self.turn)
         self.pause_menu = PauseMenu(self)
         self.ship1 = Boats(heigth*0.1, width*0.16,30,133,"boat1",3,3,"battleship1.png",self.turn)
         self.ship2 = Boats(heigth*0.43,width*0.16,20,100,"boat2",3,3,"battleship2.png",self.turn)
@@ -170,14 +169,12 @@ class IntroGame:
             screen.blit (self.hoover, [width/24,heigth/1.2])
 
 class GameMain:
-    def __init__(self, game , turn , cards):
+    def __init__(self, game , turn):
         self.button_test = False
         self.cards_shown = False
-        self.cards_draw = False
         self.pause_menu = PauseMenu
         self.game = game
         self.turn= turn
-        self.cards = cards
         self.font = pygame.font.Font(None,25)
         self.sides = pygame.image.load("sides.jpg")
         self.sides = pygame.transform.scale(self.sides, (size))
@@ -275,7 +272,7 @@ class GameMain:
         # screen.blit(self.greenline,(0,heigth*0.28))
         # screen.blit(self.greenline, (0, heigth * 0.60))
         # menu button---------------------------------------------------------------------------------------------
-        mouse_button_pressed(width*0.77,heigth*0.01, 50, 50, screen, self.pbutton,self.game.events,
+        mouse_button_pressed(width*0.96,heigth*0.01, 50, 50, screen, self.pbutton,self.game.events,
                              lambda: self.game.set_state(self.game.pause_menu))
 
         if self.turn.turn_number%2 == 0:
@@ -373,7 +370,7 @@ class GameMain:
         def next_turn_conf_false():
             self.button_test = False
 
-        mouse_button_pressed(width * 0.8, heigth * 0.9,250,70,screen,self.next_turn,self.game.events,lambda: next_turn_conf_true())
+        mouse_button_pressed(width * 0.8, heigth * 0.85,250,70,screen,self.next_turn,self.game.events,lambda: next_turn_conf_true())
         if self.button_test and self.turn.turn_number < 2:
             message_to_screen("are you sure you want to end your turn", screen, width * 0.5, heigth * 0.62, 30)
             mouse_button_pressed(width * 0.425, heigth * 0.65, 70, 70, screen, self.yes, self.game.events,
@@ -430,13 +427,8 @@ class GameMain:
             screen.blit(self.carda1, (width * 0.675, heigth * 0.32))
 
         #het krijgen van de kaarten
-        def draw_cards_true():
-            self.cards_draw = True
-        def draw_cards_false():
-            self.cards_draw = False
-        mouse_button_pressed(width * 0.82, heigth * 0.04, 170, 90, screen, self.emptyimage,self.game.events ,lambda: draw_cards_true())
-        if self.turn.turn_number % 2 == 0 and self.cards_draw :
-            self.cards.attack_cards(screen)
+        # if self.turn.turn_number % 2 == 0:
+        #     mouse_button_pressed(width * 0.82, heigth * 0.19, 170, 90, screen, self.game.events,self.turn.update())
 
 class PauseMenu:
     def __init__(self, game):
@@ -487,7 +479,7 @@ class Turn:
         self.turn_number += 1
 
     def draw(self,screen):
-        message_to_screen("current Turn:",screen,width*0.85,heigth*0.85,20)
+        message_to_screen("current Turn:",screen,width*0.85,heigth*0.76,20)
         if self.turn_number == 0:
             screen.blit(self.flag_a,(width*0.7,heigth*0.435))
             message_to_screen("Move your ships in position America!",screen,width/2.15,heigth/2.1,30)
@@ -495,9 +487,9 @@ class Turn:
             message_to_screen("Move your ships in position Russia!",screen,width/2.15,heigth/2.1,30)
             screen.blit(self.flag_r, (width * 0.7, heigth *0.435))
         elif self.turn_number %2 == 0:
-            screen.blit(self.flag_a, (width * 0.92, heigth *0.79))
+            screen.blit(self.flag_a, (width * 0.92, heigth *0.72))
         elif self.turn_number %2 == 1:
-            screen.blit(self.flag_r, (width * 0.92, heigth *0.79))
+            screen.blit(self.flag_r, (width * 0.92, heigth *0.72))
 
 class Player:
     def __init__(self,player1,player2,score,winner):
@@ -511,11 +503,7 @@ class Cards:
         self.game = game
         self.turn = turn
         self.carda = pygame.image.load("carda.jpg")
-        self.carda = pygame.transform.scale(self.carda, [90,150])
-        self.carda1 = pygame.image.load("Attack.png")
-        self.carda1 = pygame.transform.scale(self.carda1, [90, 150])
-        self.carda2 = pygame.image.load("Defensive.png")
-        self.carda2 = pygame.transform.scale(self.carda2, [90, 150])
+        self.carda = pygame.transform.scale(self.carda, [170, 90])
         self.cardd = pygame.image.load("carda.jpg")
         self.cardd = pygame.transform.scale(self.cardd, [70, 70])
         self.cards = pygame.image.load("carda.jpg")
@@ -524,16 +512,17 @@ class Cards:
         self.cardh = pygame.transform.scale(self.cardh, [70, 70])
 
     def draw (self,screen):
-        if self.game.turn_number == 2:
-            screen.blit(self.carda,(width*0.82,heigth*0.04))
-            screen.blit(self.carda, (width * 0.92, heigth * 0.04))
-            screen.blit(self.carda, (width * 0.82, heigth * 0.28))
-            screen.blit(self.carda, (width * 0.92, heigth * 0.28))
+        screen.blit(self.carda,(width*0.82,heigth*0.04))
+        screen.blit(self.carda, (width * 0.82, heigth * 0.19))
+        screen.blit(self.carda, (width * 0.82, heigth * 0.34))
+        screen.blit(self.carda, (width * 0.82, heigth * 0.49))
 
-    def attack_cards(self,screen):
-        attackcards = [self.carda1,self.carda2]
-        self.attack_cards_choice = random.choice(attackcards)
-        screen.blit(self.attack_cards_choice, (width * 0.87, heigth * 0.53))
+
+    def showcards(self,screen):
+        if self.turn.turn_number%2 ==0:
+            screen.blit(self.carda, (width * 0.3, heigth * 0.5))
+            screen.blit(self.carda, (width * 0.45, heigth * 0.5))
+            screen.blit(self.carda, (width * 0.6, heigth * 0.5))
 
 def mouse_button_pressed(x, y, w, h, screen, image_original, events, action=None):
     screen.blit(image_original, [x, y])
@@ -552,6 +541,7 @@ def message_to_screen(text,screen,x,y,size):
     textsuf , textrect = text_objects(text,largeText)
     textrect.center = ((x),(y))
     screen.blit(textsuf,textrect)
+
 
 
 def run():
