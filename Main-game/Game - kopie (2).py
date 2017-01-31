@@ -13,6 +13,9 @@ class Game:
     def __init__(self):
         pygame.init()
         self.turn= Turn()
+        self.player = Player
+        self.player1 = Player(3)
+        self.player2 = Player(3)
         self.boats = Boats
         pygame.display.set_caption("Shipwars Informatica Editon")
         self.gameExit = False
@@ -21,12 +24,12 @@ class Game:
         self.intro_game = IntroGame(self)
         self.game_main = GameMain(self,self.turn,self.cards)
         self.pause_menu = PauseMenu(self)
-        self.ship1 = Boats(heigth*0.045, width*0.46,30,133,"boat1",3,2,"battleship1.png",self.turn)
-        self.ship2 = Boats(heigth*0.045,width*0.512,20,100,"boat2",3,3,"battleship2.png",self.turn)
-        self.ship3 = Boats(heigth * 0.045,width*0.564,20,100,"boat3",3,3,"battleship.png",self.turn)
-        self.ship4 = Boats(heigth * 0.79, width * 0.46, 30, 130, "boat1", 3, 2, "battleship5.png",self.turn)
+        self.ship1 = Boats(heigth*0.040, width*0.4583,30,133,"boat1",4,2,"battleship1.png",self.turn)
+        self.ship2 = Boats(heigth*0.040,width*0.511,20,100,"boat2",3,3,"battleship2.png",self.turn)
+        self.ship3 = Boats(heigth * 0.040,width*0.562,20,100,"boat3",2,3,"battleship.png",self.turn)
+        self.ship4 = Boats(heigth * 0.79, width * 0.46, 30, 130, "boat1", 4, 2, "battleship5.png",self.turn)
         self.ship5 = Boats(heigth * 0.83, width * 0.512, 20, 100, "boat2", 3, 3, "battleship6.png",self.turn)
-        self.ship6 = Boats(heigth * 0.83, width * 0.564, 20, 100, "boat3", 3, 3, "battleship4.png",self.turn)
+        self.ship6 = Boats(heigth * 0.83, width * 0.564, 20, 100, "boat3", 2, 3, "battleship4.png",self.turn)
         self.state = self.intro_game
         self.events = []
 
@@ -136,8 +139,6 @@ class Boats:
             if self.lead_x> width * 0.747:
                 self.lead_x = width * 0.747
 
-
-
 class IntroGame:
     def __init__(self, game):
         # sprites
@@ -215,8 +216,8 @@ class GameMain:
         self.redline = pygame.transform.scale(self.redline,[670,150])
         self.ihealth = pygame.image.load("healthon.png")
         self.ihealth = pygame.transform.scale(self.ihealth, [30, 30])
-        self.ohealth = pygame.image.load("healthoff.jpg")
-        self.ohealth = pygame.transform.scale(self.ihealth, [30, 30])
+        self.ohealth = pygame.image.load("healthoff.png")
+        self.ohealth = pygame.transform.scale(self.ohealth, [30, 30])
         self.yes = pygame.image.load("yes.png")
         self.yes = pygame.transform.scale(self.yes, [70,70])
         self.no = pygame.image.load("no.png")
@@ -252,6 +253,8 @@ class GameMain:
 
 
 
+
+
     def draw(self, screen):
         #standaard images----------------------------------------------------------------------------------------
         screen.blit(self.sides, [0, 0])
@@ -265,6 +268,8 @@ class GameMain:
         screen.blit(self.abutton, (width * 0.01, heigth*0.02))
         screen.blit(self.abutton, (width * 0.01, heigth * 0.335))
         screen.blit(self.abutton, (width * 0.01, heigth * 0.653))
+        message_to_screen("scorep1 : {}".format(self.game.player1.boats), screen, width * 0.06, heigth * 0.3, 18)
+
         # menu button---------------------------------------------------------------------------------------------
         mouse_button_pressed(width*0.77,heigth*0.01, 50, 50, screen, self.pbutton,self.game.events,
                              lambda: self.game.set_state(self.game.pause_menu))
@@ -393,9 +398,16 @@ class GameMain:
         elif self.turn.turn_number == 1:
             screen.blit(self.redline,(width*0.25,heigth*0.655))
 
+        if self.game.ship1.hp<= 0 and self.game.ship2.hp <= 0 and self.game.ship3.hp <= 0:
+            self.game.state = self.game.pause_menu
+
+
+
+
         # placing health button------------------------------------------------------------------------------------
         def healthoff(self):
             self.min_health = True
+
         screen.blit(self.ihealth,(width*0.13,heigth*0.03))
         screen.blit(self.ihealth, (width * 0.155, heigth * 0.03))
         screen.blit(self.ihealth, (width * 0.18, heigth * 0.03))
@@ -407,6 +419,80 @@ class GameMain:
         #--------------------------------------------------------
         screen.blit(self.ihealth, (width * 0.13, heigth * 0.67))
         screen.blit(self.ihealth, (width * 0.155, heigth * 0.67))
+
+        if self.min_health:
+            if self.turn.turn_number % 2 == 0:
+                if self.game.ship1.hp == 3:
+                    screen.blit(self.ohealth, (width * 0.205, heigth * 0.03))
+                elif self.game.ship1.hp ==2:
+                    screen.blit(self.ohealth, (width * 0.205, heigth * 0.03))
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.03))
+                elif self.game.ship1.hp == 1:
+                    screen.blit(self.ohealth, (width * 0.205, heigth * 0.03))
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.03))
+                    screen.blit(self.ohealth, (width * 0.155, heigth * 0.03))
+                elif self.game.ship1.hp <= 0:
+                    screen.blit(self.ohealth, (width * 0.205, heigth * 0.03))
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.03))
+                    screen.blit(self.ohealth, (width * 0.155, heigth * 0.03))
+                    screen.blit(self.ohealth, (width*0.13,heigth*0.03))
+
+
+
+                if self.game.ship2.hp ==2:
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.35))
+                elif self.game.ship2.hp == 1:
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.35))
+                    screen.blit(self.ohealth, (width * 0.155, heigth * 0.35))
+                elif self.game.ship2.hp <= 0:
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.35))
+                    screen.blit(self.ohealth, (width * 0.155, heigth * 0.35))
+                    screen.blit(self.ohealth, (width*0.13,heigth*0.35))
+
+
+                if self.game.ship3.hp == 1:
+                    screen.blit(self.ohealth, (width * 0.155, heigth * 0.67))
+                elif self.game.ship3.hp <= 0:
+                    screen.blit(self.ohealth, (width * 0.155, heigth *0.67))
+                    screen.blit(self.ohealth, (width*0.13,heigth*0.67))
+
+            elif self.turn.turn_number %2 ==1 :
+                if self.game.ship4.hp == 3:
+                    screen.blit(self.ohealth, (width * 0.205, heigth * 0.03))
+                elif self.game.ship4.hp ==2:
+                    screen.blit(self.ohealth, (width * 0.205, heigth * 0.03))
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.03))
+                elif self.game.ship4.hp == 1:
+                    screen.blit(self.ohealth, (width * 0.205, heigth * 0.03))
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.03))
+                    screen.blit(self.ohealth, (width * 0.155, heigth * 0.03))
+                elif self.game.ship4.hp <= 0:
+                    screen.blit(self.ohealth, (width * 0.205, heigth * 0.03))
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.03))
+                    screen.blit(self.ohealth, (width * 0.155, heigth * 0.03))
+                    screen.blit(self.ohealth, (width*0.13,heigth*0.03))
+
+
+
+                if self.game.ship5.hp ==2:
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.35))
+                elif self.game.ship5.hp == 1:
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.35))
+                    screen.blit(self.ohealth, (width * 0.155, heigth * 0.35))
+                elif self.game.ship5.hp <= 0:
+                    screen.blit(self.ohealth, (width * 0.18, heigth * 0.35))
+                    screen.blit(self.ohealth, (width * 0.155, heigth * 0.35))
+                    screen.blit(self.ohealth, (width*0.13,heigth*0.35))
+
+
+
+                if self.game.ship6.hp==1:
+                    screen.blit(self.ohealth, (width * 0.155, heigth * 0.67))
+                elif self.game.ship6.hp <= 0:
+                    screen.blit(self.ohealth, (width * 0.155, heigth *0.67))
+                    screen.blit(self.ohealth, (width*0.13,heigth*0.67))
+
+
         #werking van showing cards--------------------------------------------------------
 
         def show_cards_true():
@@ -443,12 +529,6 @@ class GameMain:
             message_to_screen("Fuel available: {}".format(self.game.ship4.feul), screen, width*0.06, heigth*0.25, 18)
             message_to_screen("Fuel available: {}".format(self.game.ship5.feul), screen, width*0.06, heigth*0.56, 18)
             message_to_screen("Fuel available: {}".format(self.game.ship6.feul), screen, width*0.06, heigth*0.88, 18)
-        #draw the health
-        message_to_screen("hp ship1: {}".format(self.game.ship1.hp), screen, width*0.06, heigth*0.3, 18)
-        message_to_screen("hp ship2: {}".format(self.game.ship2.hp), screen, width * 0.06, heigth * 0.61, 18)
-        message_to_screen("hp ship3: {}".format(self.game.ship3.hp), screen, width * 0.06, heigth * 0.93, 18)
-
-
 
 
 
@@ -464,56 +544,104 @@ class GameMain:
                              self.game.events)
         mouse_button_pressed(self.game.ship6.lead_x, self.game.ship6.lead_y, 20, 100, screen, self.emptyimage,
                              self.game.events)
+
         #attack of boats --------------------------------------------------------------------------------------------------
+
+
         def subtract_health_1(self,screen):
             self.game.ship1.hp -= 1
-            if self.turn.turn_number %2 == 0:
-                if self.game.ship1.hp == 2:
-                    pass
+            healthoff(self)
+
         def subtract_health_2(self,screen):
             self.game.ship2.hp -= 1
-            if self.turn.turn_number %2 == 0:
-                if self.game.ship1.hp == 2:
-                    pass
+            healthoff(self)
+
         def subtract_health_3(self,screen):
             self.game.ship3.hp -= 1
-            if self.turn.turn_number %2 == 0:
-                if self.game.ship1.hp == 2:
-                    pass
+            healthoff(self)
 
+        def subtract_health_4(self,screen):
+            self.game.ship4.hp -= 1
+            healthoff(self)
+
+        def subtract_health_5(self,screen):
+            self.game.ship5.hp -= 1
+            healthoff(self)
+
+        def subtract_health_6(self,screen):
+            self.game.ship6.hp -= 1
+            healthoff(self)
 
         if self.turn.turn_number%2 == 1:
-            if self.game.ship4.lead_y - self.game.ship4.height - (self.block_size_up_down*3)<self.game.ship1.lead_y and self.game.ship4.lead_x >= self.game.ship1.lead_x and self.game.ship4.lead_x < self.game.ship1.lead_x + self.game.ship1.width:
-                mouse_button_pressed(width * 0.82, heigth * 0.7, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_1(self,screen))
+            if self.game.ship4.lead_y - self.game.ship4.height - (self.block_size_up_down*3)<self.game.ship1.lead_y and self.game.ship4.lead_x >= self.game.ship1.lead_x and self.game.ship4.lead_x < self.game.ship1.lead_x + self.game.ship1.width and self.game.ship4.lead_y-10+self.game.ship4.height>self.game.ship1.lead_y or self.game.ship4.lead_x + self.game.ship4.width + (self.block_size*3)>self.game.ship1.lead_x and self.game.ship4.lead_x < self.game.ship1.lead_x + self.game.ship1.width and self.game.ship4.lead_y <= self.game.ship1.lead_y+self.game.ship1.height and self.game.ship4.lead_y-10+self.game.ship4.height>self.game.ship1.lead_y or self.game.ship4.lead_x - (self.block_size*3) < self.game.ship1.lead_x+self.game.ship1.width and self.game.ship4.lead_x+-5>self.game.ship1.lead_x and self.game.ship4.lead_y <= self.game.ship1.lead_y + self.game.ship1.height and self.game.ship4.lead_y-10+self.game.ship4.height>self.game.ship1.lead_y:
+                mouse_button_pressed(width * 0.09, heigth * 0.13, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_1(self,screen))
 
-            elif self.game.ship4.lead_y - self.game.ship4.height - (self.block_size_up_down*3)<self.game.ship2.lead_y and self.game.ship4.lead_x >= self.game.ship2.lead_x and self.game.ship4.lead_x < self.game.ship2.lead_x + self.game.ship2.width:
-                mouse_button_pressed(width * 0.82, heigth * 0.7, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_2(self,screen))
+            if self.game.ship4.lead_y - self.game.ship4.height - (self.block_size_up_down*2)<self.game.ship2.lead_y and self.game.ship4.lead_x >= self.game.ship2.lead_x and self.game.ship4.lead_x < self.game.ship2.lead_x + self.game.ship2.width and self.game.ship4.lead_y-30+self.game.ship4.height>self.game.ship2.lead_y or self.game.ship4.lead_x + self.game.ship4.width + (self.block_size*3)>self.game.ship2.lead_x and self.game.ship4.lead_x < self.game.ship2.lead_x + self.game.ship2.width and self.game.ship4.lead_y <= self.game.ship2.lead_y+self.game.ship2.height  and self.game.ship4.lead_y-10+self.game.ship4.height>self.game.ship2.lead_y or self.game.ship4.lead_x - (self.block_size*3) < self.game.ship2.lead_x+self.game.ship2.width and self.game.ship4.lead_x+-5>self.game.ship2.lead_x and self.game.ship4.lead_y <= self.game.ship2.lead_y + self.game.ship2.height and self.game.ship4.lead_y-10+self.game.ship4.height>self.game.ship2.lead_y:
+                mouse_button_pressed(width * 0.09, heigth * 0.13, 170, 90, screen, self.attack_button, self.game.events,lambda: subtract_health_2(self, screen))
 
-            elif self.game.ship4.lead_y - self.game.ship4.height - (self.block_size_up_down*3)<self.game.ship3.lead_y and self.game.ship4.lead_x >= self.game.ship3.lead_x and self.game.ship4.lead_x < self.game.ship3.lead_x + self.game.ship3.width:
-                mouse_button_pressed(width * 0.82, heigth * 0.7, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_3(self,screen))
+            if self.game.ship4.lead_y - self.game.ship4.height - (self.block_size_up_down*2)<self.game.ship3.lead_y and self.game.ship4.lead_x >= self.game.ship3.lead_x and self.game.ship4.lead_x < self.game.ship3.lead_x + self.game.ship3.width and self.game.ship4.lead_y-10+self.game.ship4.height>self.game.ship3.lead_y or self.game.ship4.lead_x + self.game.ship4.width + (self.block_size*3)>self.game.ship3.lead_x and self.game.ship4.lead_x < self.game.ship3.lead_x + self.game.ship3.width and self.game.ship4.lead_y <= self.game.ship3.lead_y+self.game.ship3.height and self.game.ship4.lead_y-10+self.game.ship4.height>self.game.ship3.lead_y or self.game.ship4.lead_x - (self.block_size*3) < self.game.ship3.lead_x+self.game.ship3.width and self.game.ship4.lead_x+-5>self.game.ship3.lead_x and self.game.ship4.lead_y <= self.game.ship3.lead_y + self.game.ship3.height and self.game.ship4.lead_y-10+self.game.ship4.height>self.game.ship3.lead_y:
+                mouse_button_pressed(width * 0.09, heigth * 0.13, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_3(self,screen))
 
-            elif self.game.ship5.lead_y - self.game.ship5.height - (self.block_size_up_down*2)<self.game.ship1.lead_y and self.game.ship5.lead_x >= self.game.ship1.lead_x and self.game.ship5.lead_x < self.game.ship1.lead_x + self.game.ship1.width:
-                mouse_button_pressed(width * 0.82, heigth * 0.7, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_1(self,screen))
 
-            elif self.game.ship5.lead_y - self.game.ship5.height - (self.block_size_up_down*2)<self.game.ship2.lead_y and self.game.ship5.lead_x >= self.game.ship2.lead_x and self.game.ship5.lead_x < self.game.ship2.lead_x + self.game.ship2.width:
-                mouse_button_pressed(width * 0.82, heigth * 0.7, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_2(self,screen))
+            if self.game.ship5.lead_y - self.game.ship5.height - (self.block_size_up_down*3)<self.game.ship1.lead_y and self.game.ship5.lead_x >= self.game.ship1.lead_x and self.game.ship5.lead_x < self.game.ship1.lead_x + self.game.ship1.width and self.game.ship5.lead_y-10+self.game.ship5.height>self.game.ship1.lead_y or self.game.ship5.lead_x + self.game.ship5.width + (self.block_size*2)>self.game.ship1.lead_x and self.game.ship5.lead_x < self.game.ship1.lead_x + self.game.ship1.width and self.game.ship5.lead_y <= self.game.ship1.lead_y+self.game.ship1.height and self.game.ship5.lead_y-10+self.game.ship5.height>self.game.ship1.lead_y or self.game.ship5.lead_x - (self.block_size*2) < self.game.ship1.lead_x+self.game.ship1.width and self.game.ship5.lead_x+-5>self.game.ship1.lead_x and self.game.ship5.lead_y <= self.game.ship1.lead_y + self.game.ship1.height and self.game.ship5.lead_y-10+self.game.ship5.height>self.game.ship1.lead_y:
+                mouse_button_pressed(width * 0.09, heigth * 0.435, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_1(self,screen))
 
-            elif self.game.ship5.lead_y - self.game.ship5.height - (self.block_size_up_down*2)<self.game.ship3.lead_y and self.game.ship5.lead_x >= self.game.ship3.lead_x and self.game.ship5.lead_x < self.game.ship3.lead_x + self.game.ship3.width:
-                mouse_button_pressed(width * 0.82, heigth * 0.7, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_3(self,screen))
+            if self.game.ship5.lead_y - self.game.ship5.height - (self.block_size_up_down * 2) < self.game.ship2.lead_y and self.game.ship5.lead_x >= self.game.ship2.lead_x and self.game.ship5.lead_x < self.game.ship2.lead_x + self.game.ship2.width and self.game.ship5.lead_y - 10 + self.game.ship5.height > self.game.ship2.lead_y or self.game.ship5.lead_x + self.game.ship5.width + (self.block_size * 2) > self.game.ship2.lead_x and self.game.ship5.lead_x < self.game.ship2.lead_x + self.game.ship2.width and self.game.ship5.lead_y <= self.game.ship2.lead_y + self.game.ship2.height and self.game.ship5.lead_y - 10 + self.game.ship5.height > self.game.ship2.lead_y or self.game.ship5.lead_x - (self.block_size * 2) < self.game.ship2.lead_x + self.game.ship2.width and self.game.ship5.lead_x + -5 > self.game.ship2.lead_x and self.game.ship5.lead_y <= self.game.ship2.lead_y + self.game.ship2.height and self.game.ship5.lead_y - 10 + self.game.ship5.height > self.game.ship2.lead_y:
+                mouse_button_pressed(width * 0.09, heigth * 0.435, 170, 90, screen, self.attack_button,self.game.events, lambda: subtract_health_1(self, screen))
 
-            elif self.game.ship6.lead_y - self.game.ship6.height - (self.block_size_up_down*2)<self.game.ship1.lead_y and self.game.ship6.lead_x >= self.game.ship1.lead_x and self.game.ship6.lead_x < self.game.ship1.lead_x + self.game.ship1.width:
-                mouse_button_pressed(width * 0.82, heigth * 0.7, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_1(self,screen))
+            if self.game.ship5.lead_y - self.game.ship5.height - (self.block_size_up_down * 2) < self.game.ship3.lead_y and self.game.ship5.lead_x >= self.game.ship3.lead_x and self.game.ship5.lead_x < self.game.ship3.lead_x + self.game.ship3.width and self.game.ship5.lead_y - 10 + self.game.ship5.height > self.game.ship3.lead_y or self.game.ship5.lead_x + self.game.ship5.width + (self.block_size * 2) > self.game.ship3.lead_x and self.game.ship5.lead_x < self.game.ship3.lead_x + self.game.ship3.width and self.game.ship5.lead_y <= self.game.ship3.lead_y + self.game.ship3.height and self.game.ship5.lead_y - 10 + self.game.ship5.height > self.game.ship3.lead_y or self.game.ship5.lead_x - (self.block_size * 2) < self.game.ship3.lead_x + self.game.ship3.width and self.game.ship5.lead_x + -5 > self.game.ship3.lead_x and self.game.ship5.lead_y <= self.game.ship3.lead_y + self.game.ship3.height and self.game.ship5.lead_y - 10 + self.game.ship5.height > self.game.ship3.lead_y:
+                    mouse_button_pressed(width * 0.09, heigth * 0.435, 170, 90, screen, self.attack_button,self.game.events, lambda: subtract_health_1(self, screen))
 
-            elif self.game.ship5.lead_y - self.game.ship6.height - (self.block_size_up_down*2)<self.game.ship2.lead_y and self.game.ship6.lead_x >= self.game.ship2.lead_x and self.game.ship6.lead_x < self.game.ship2.lead_x + self.game.ship2.width:
-                mouse_button_pressed(width * 0.82, heigth * 0.7, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_2(self,screen))
 
-            elif self.game.ship6.lead_y - self.game.ship6.height - (self.block_size_up_down*2)<self.game.ship3.lead_y and self.game.ship6.lead_x >= self.game.ship3.lead_x and self.game.ship6.lead_x < self.game.ship3.lead_x + self.game.ship3.width:
-                mouse_button_pressed(width * 0.82, heigth * 0.7, 170, 90, screen, self.attack_button, self.game.events,lambda:subtract_health_3(self,screen))
+            if self.game.ship6.lead_y - self.game.ship6.height - (self.block_size_up_down * 3) < self.game.ship1.lead_y and self.game.ship6.lead_x >= self.game.ship1.lead_x and self.game.ship6.lead_x < self.game.ship1.lead_x + self.game.ship1.width and self.game.ship6.lead_y - 10 + self.game.ship6.height > self.game.ship1.lead_y or self.game.ship6.lead_x + self.game.ship6.width + (self.block_size * 2) > self.game.ship1.lead_x and self.game.ship6.lead_x < self.game.ship1.lead_x + self.game.ship1.width and self.game.ship6.lead_y <= self.game.ship1.lead_y + self.game.ship1.height and self.game.ship6.lead_y - 10 + self.game.ship6.height > self.game.ship1.lead_y or self.game.ship6.lead_x - (self.block_size * 2) < self.game.ship1.lead_x + self.game.ship1.width and self.game.ship6.lead_x + -5 > self.game.ship1.lead_x and self.game.ship6.lead_y <= self.game.ship1.lead_y + self.game.ship1.height and self.game.ship6.lead_y - 10 + self.game.ship6.height > self.game.ship1.lead_y:
+                    mouse_button_pressed(width * 0.09, heigth * 0.744, 170, 90, screen, self.attack_button,self.game.events, lambda: subtract_health_1(self, screen))
 
-        # if self.turn.turn_number %2 == 1:
-        #     if self.game.ship1.lead_y + self.game.ship1.height + (self.block_size_up_down*3)> self.game.ship4.lead_y+self.game.ship4.width:
-        #         mouse_button_pressed(width * 0.82, heigth * 0.7, 170, 90, screen, self.attack_button, self.game.events,
-        #                              lambda: subtract_health_1(self, screen))
+            if self.game.ship6.lead_y - self.game.ship6.height - (self.block_size_up_down * 2) < self.game.ship2.lead_y and self.game.ship6.lead_x >= self.game.ship2.lead_x and self.game.ship6.lead_x < self.game.ship2.lead_x + self.game.ship2.width and self.game.ship6.lead_y - 10 + self.game.ship6.height > self.game.ship2.lead_y or self.game.ship6.lead_x + self.game.ship6.width + (self.block_size * 2) > self.game.ship2.lead_x and self.game.ship6.lead_x < self.game.ship2.lead_x + self.game.ship2.width and self.game.ship6.lead_y <= self.game.ship2.lead_y + self.game.ship2.height and self.game.ship6.lead_y - 10 + self.game.ship6.height > self.game.ship2.lead_y or self.game.ship6.lead_x - (self.block_size * 2) < self.game.ship2.lead_x + self.game.ship2.width and self.game.ship6.lead_x + -5 > self.game.ship2.lead_x and self.game.ship6.lead_y <= self.game.ship2.lead_y + self.game.ship2.height and self.game.ship6.lead_y - 10 + self.game.ship6.height > self.game.ship2.lead_y:
+                        mouse_button_pressed(width * 0.09, heigth * 0.744, 170, 90, screen, self.attack_button,self.game.events, lambda: subtract_health_1(self, screen))
+
+            if self.game.ship6.lead_y - self.game.ship6.height - (self.block_size_up_down * 2) < self.game.ship3.lead_y and self.game.ship6.lead_x >= self.game.ship3.lead_x and self.game.ship6.lead_x < self.game.ship3.lead_x + self.game.ship3.width and self.game.ship6.lead_y - 10 + self.game.ship6.height > self.game.ship3.lead_y or self.game.ship6.lead_x + self.game.ship6.width + (self.block_size * 2) > self.game.ship3.lead_x and self.game.ship6.lead_x < self.game.ship3.lead_x + self.game.ship3.width and self.game.ship6.lead_y <= self.game.ship3.lead_y + self.game.ship3.height and self.game.ship6.lead_y - 10 + self.game.ship6.height > self.game.ship3.lead_y or self.game.ship6.lead_x - (self.block_size * 2) < self.game.ship3.lead_x + self.game.ship3.width and self.game.ship6.lead_x + -5 > self.game.ship3.lead_x and self.game.ship6.lead_y <= self.game.ship3.lead_y + self.game.ship3.height and self.game.ship6.lead_y - 10 + self.game.ship6.height > self.game.ship3.lead_y:
+                        mouse_button_pressed(width * 0.09, heigth * 0.744, 170, 90, screen, self.attack_button,self.game.events, lambda: subtract_health_1(self, screen))
+
+
+
+
+
+        elif self.turn.turn_number %2 == 0:
+            if self.game.ship1.lead_y + self.game.ship1.height + (self.block_size_up_down*3)> self.game.ship4.lead_y and self.game.ship1.lead_x+10 >= self.game.ship4.lead_x and self.game.ship1.lead_x < self.game.ship4.lead_x + self.game.ship4.width and self.game.ship1.lead_y  +self.game.ship1.height<=self.game.ship4.lead_y or self.game.ship1.lead_x+self.game.ship1.width+(self.block_size*3)>self.game.ship4.lead_x and self.game.ship1.lead_x+self.game.ship1.width<self.game.ship4.lead_x and self.game.ship1.lead_y+self.game.ship1.height>= self.game.ship4.lead_y and self.game.ship1.lead_y-self.game.ship1.height <=self.game.ship4.lead_y-10 or self.game.ship1.lead_x - (self.block_size*3)<self.game.ship4.lead_x and self.game.ship1.lead_x>self.game.ship4.lead_x and self.game.ship1.lead_y+self.game.ship1.height>self.game.ship4.lead_y and self.game.ship1.lead_y<self.game.ship4.lead_y+self.game.ship4.height-10:
+                 mouse_button_pressed(width * 0.09, heigth * 0.13, 170, 90, screen, self.attack_button, self.game.events,
+                                      lambda: subtract_health_4(self, screen))
+            if self.game.ship1.lead_y + self.game.ship1.height + (self.block_size_up_down * 3) > self.game.ship5.lead_y and self.game.ship1.lead_x + 10 >= self.game.ship5.lead_x and self.game.ship1.lead_x < self.game.ship5.lead_x + self.game.ship5.width and self.game.ship1.lead_y   + self.game.ship1.height <= self.game.ship5.lead_y or self.game.ship1.lead_x + self.game.ship1.width + (self.block_size * 3) > self.game.ship5.lead_x and self.game.ship1.lead_x + self.game.ship1.width < self.game.ship5.lead_x  and self.game.ship1.lead_y+self.game.ship1.height>= self.game.ship5.lead_y and self.game.ship1.lead_y-self.game.ship1.height < self.game.ship5.lead_y -40  or self.game.ship1.lead_x - (self.block_size * 3) < self.game.ship5.lead_x and self.game.ship1.lead_x > self.game.ship5.lead_x and self.game.ship1.lead_y + self.game.ship1.height > self.game.ship5.lead_y and self.game.ship1.lead_y < self.game.ship5.lead_y + self.game.ship5.height -10:
+                     mouse_button_pressed(width * 0.09, heigth * 0.13, 170, 90, screen, self.attack_button,
+                                          self.game.events,
+                                          lambda: subtract_health_5(self, screen))
+            if self.game.ship1.lead_y + self.game.ship1.height + (self.block_size_up_down * 3) > self.game.ship6.lead_y and self.game.ship1.lead_x + 10 >= self.game.ship6.lead_x and self.game.ship1.lead_x < self.game.ship6.lead_x + self.game.ship6.width and self.game.ship1.lead_y + self.game.ship1.height <= self.game.ship6.lead_y or self.game.ship1.lead_x + self.game.ship1.width + (self.block_size * 3) > self.game.ship6.lead_x and self.game.ship1.lead_x + self.game.ship1.width < self.game.ship6.lead_x and self.game.ship1.lead_y + self.game.ship1.height >= self.game.ship6.lead_y and self.game.ship1.lead_y - self.game.ship1.height < self.game.ship6.lead_y - 40 or self.game.ship1.lead_x - (self.block_size * 3) < self.game.ship6.lead_x and self.game.ship1.lead_x > self.game.ship6.lead_x and self.game.ship1.lead_y + self.game.ship1.height > self.game.ship6.lead_y and self.game.ship1.lead_y < self.game.ship6.lead_y + self.game.ship6.height - 10:
+                     mouse_button_pressed(width * 0.09, heigth * 0.13, 170, 90, screen, self.attack_button,self.game.events,lambda: subtract_health_6(self, screen))
+
+
+            if self.game.ship2.lead_y + self.game.ship2.height + (self.block_size_up_down * 2) > self.game.ship6.lead_y and self.game.ship2.lead_x + 10 >= self.game.ship6.lead_x and self.game.ship2.lead_x < self.game.ship6.lead_x + self.game.ship6.width and self.game.ship2.lead_y + self.game.ship2.height <= self.game.ship6.lead_y or self.game.ship2.lead_x + self.game.ship2.width + (self.block_size * 2) > self.game.ship6.lead_x and self.game.ship2.lead_x + self.game.ship2.width < self.game.ship6.lead_x and self.game.ship2.lead_y + self.game.ship2.height >= self.game.ship6.lead_y and self.game.ship2.lead_y - self.game.ship2.height < self.game.ship6.lead_y -20or self.game.ship2.lead_x - (self.block_size * 2) < self.game.ship6.lead_x and self.game.ship2.lead_x > self.game.ship6.lead_x and self.game.ship2.lead_y + self.game.ship2.height > self.game.ship6.lead_y and self.game.ship2.lead_y < self.game.ship6.lead_y + self.game.ship6.height - 10:
+                    mouse_button_pressed(width * 0.09, heigth * 0.435, 170, 90, screen, self.attack_button,
+                                              self.game.events, lambda: subtract_health_6(self, screen))
+
+            if self.game.ship2.lead_y + self.game.ship2.height + (self.block_size_up_down * 2) > self.game.ship5.lead_y and self.game.ship2.lead_x + 10 >= self.game.ship5.lead_x and self.game.ship2.lead_x < self.game.ship5.lead_x + self.game.ship5.width and self.game.ship2.lead_y + self.game.ship2.height <= self.game.ship5.lead_y or self.game.ship2.lead_x + self.game.ship2.width + (self.block_size * 2) > self.game.ship5.lead_x and self.game.ship2.lead_x + self.game.ship2.width < self.game.ship5.lead_x and self.game.ship2.lead_y + self.game.ship2.height >= self.game.ship5.lead_y and self.game.ship2.lead_y - self.game.ship2.height < self.game.ship5.lead_y - 20 or self.game.ship2.lead_x - (self.block_size * 2) < self.game.ship5.lead_x and self.game.ship2.lead_x > self.game.ship5.lead_x and self.game.ship2.lead_y + self.game.ship2.height > self.game.ship5.lead_y and self.game.ship2.lead_y < self.game.ship5.lead_y + self.game.ship5.height - 10:
+                    mouse_button_pressed(width * 0.09, heigth * 0.435, 170, 90, screen, self.attack_button,
+                                             self.game.events, lambda: subtract_health_5(self, screen))
+
+            if self.game.ship2.lead_y + self.game.ship2.height + (self.block_size_up_down * 2) > self.game.ship4.lead_y and self.game.ship2.lead_x + 10 >= self.game.ship4.lead_x and self.game.ship2.lead_x < self.game.ship4.lead_x + self.game.ship4.width and self.game.ship2.lead_y + self.game.ship2.height  <= self.game.ship4.lead_y  or self.game.ship2.lead_x + self.game.ship2.width + (self.block_size * 2) > self.game.ship4.lead_x and self.game.ship2.lead_x + self.game.ship2.width < self.game.ship4.lead_x and self.game.ship2.lead_y + self.game.ship2.height  >= self.game.ship4.lead_y and self.game.ship2.lead_y - self.game.ship2.height - 30 < self.game.ship4.lead_y - 20 or self.game.ship2.lead_x - (self.block_size * 2) < self.game.ship4.lead_x and self.game.ship2.lead_x > self.game.ship4.lead_x and self.game.ship2.lead_y + self.game.ship2.height > self.game.ship4.lead_y and self.game.ship2.lead_y < self.game.ship4.lead_y + self.game.ship4.height - 10:
+                    mouse_button_pressed(width * 0.09, heigth * 0.435, 170, 90, screen, self.attack_button,
+                                                 self.game.events, lambda: subtract_health_4(self, screen))
+
+            if self.game.ship3.lead_y + self.game.ship3.height + (self.block_size_up_down * 2) > self.game.ship4.lead_y and self.game.ship3.lead_x + 10 >= self.game.ship4.lead_x and self.game.ship3.lead_x < self.game.ship4.lead_x + self.game.ship4.width and self.game.ship3.lead_y + self.game.ship3.height <= self.game.ship4.lead_y or self.game.ship3.lead_x + self.game.ship3.width + (self.block_size * 2) > self.game.ship4.lead_x and self.game.ship3.lead_x + self.game.ship3.width < self.game.ship4.lead_x and self.game.ship3.lead_y + self.game.ship3.height >= self.game.ship4.lead_y and self.game.ship3.lead_y - self.game.ship3.height < self.game.ship4.lead_y  or self.game.ship3.lead_x - (self.block_size * 2) < self.game.ship4.lead_x and self.game.ship3.lead_x > self.game.ship4.lead_x and self.game.ship3.lead_y + self.game.ship3.height > self.game.ship4.lead_y and self.game.ship3.lead_y < self.game.ship4.lead_y + self.game.ship4.height - 10:
+                    mouse_button_pressed(width * 0.09, heigth * 0.744, 170, 90, screen, self.attack_button,
+                                             self.game.events, lambda: subtract_health_4(self, screen))
+
+            if self.game.ship3.lead_y + self.game.ship3.height + (self.block_size_up_down * 2) > self.game.ship5.lead_y and self.game.ship3.lead_x + 10 >= self.game.ship5.lead_x and self.game.ship3.lead_x < self.game.ship5.lead_x + self.game.ship5.width and self.game.ship3.lead_y + self.game.ship3.height <= self.game.ship5.lead_y or self.game.ship3.lead_x + self.game.ship3.width + (self.block_size * 2) > self.game.ship5.lead_x and self.game.ship3.lead_x + self.game.ship3.width < self.game.ship5.lead_x and self.game.ship3.lead_y + self.game.ship3.height >= self.game.ship5.lead_y and self.game.ship3.lead_y - self.game.ship3.height < self.game.ship5.lead_y -20 or self.game.ship3.lead_x - (self.block_size * 2) < self.game.ship5.lead_x and self.game.ship3.lead_x > self.game.ship5.lead_x and self.game.ship3.lead_y + self.game.ship3.height > self.game.ship5.lead_y and self.game.ship3.lead_y < self.game.ship5.lead_y + self.game.ship5.height - 10:
+                    mouse_button_pressed(width * 0.09, heigth * 0.744, 170, 90, screen, self.attack_button,
+                                                 self.game.events, lambda: subtract_health_5(self, screen))
+
+            if self.game.ship3.lead_y + self.game.ship3.height + (self.block_size_up_down * 2) > self.game.ship6.lead_y and self.game.ship3.lead_x + 10 >= self.game.ship6.lead_x and self.game.ship3.lead_x < self.game.ship6.lead_x + self.game.ship6.width and self.game.ship3.lead_y + self.game.ship3.height <= self.game.ship6.lead_y or self.game.ship3.lead_x + self.game.ship3.width + (self.block_size * 2) > self.game.ship6.lead_x and self.game.ship3.lead_x + self.game.ship3.width < self.game.ship6.lead_x and self.game.ship3.lead_y + self.game.ship3.height >= self.game.ship6.lead_y and self.game.ship3.lead_y - self.game.ship3.height < self.game.ship6.lead_y - 20 or self.game.ship3.lead_x - (self.block_size * 2) < self.game.ship6.lead_x and self.game.ship3.lead_x > self.game.ship6.lead_x and self.game.ship3.lead_y + self.game.ship3.height > self.game.ship6.lead_y and self.game.ship3.lead_y < self.game.ship6.lead_y + self.game.ship6.height - 10:
+                    mouse_button_pressed(width * 0.09, heigth * 0.744, 170, 90, screen, self.attack_button,
+                                                     self.game.events, lambda: subtract_health_6(self, screen))
+
 
 
 class PauseMenu:
@@ -548,7 +676,6 @@ class PauseMenu:
 class Turn:
     def __init__(self):
         self.turn_number = 0
-        self.player = Player
         self.boats = Boats
         self.flag_a=pygame.image.load("flag_a.png")
         self.flag_a=pygame.transform.scale(self.flag_a,[80,60])
@@ -574,41 +701,37 @@ class Turn:
             screen.blit(self.flag_r, (width * 0.92, heigth *0.79))
 
 class Player:
-    def __init__(self,player1,player2,score,winner):
-        self.player1 = player1
-        self.player1 = player2
-        self.score = score
-        self.winner = winner
+    def __init__(self,boats):
+        self.game = Game
+        self.boats = boats
+        self.player = Player
 
 class Cards:
     def __init__(self,turn,game):
         self.game = game
         self.turn = turn
-        self.carda = pygame.image.load("carda.jpg")
-        self.carda = pygame.transform.scale(self.carda, [90,150])
+        self.cardat = pygame.image.load("offensive_back.png")
+        self.cardat = pygame.transform.scale(self.cardat, [90,150])
         self.carda1 = pygame.image.load("Attack.png")
         self.carda1 = pygame.transform.scale(self.carda1, [90, 150])
-        self.carda2 = pygame.image.load("Defensive.png")
-        self.carda2 = pygame.transform.scale(self.carda2, [90, 150])
-        self.cardd = pygame.image.load("carda.jpg")
-        self.cardd = pygame.transform.scale(self.cardd, [70, 70])
-        self.cards = pygame.image.load("carda.jpg")
-        self.cards = pygame.transform.scale(self.cards, [70, 70])
-        self.cardh = pygame.image.load("carda.jpg")
-        self.cardh = pygame.transform.scale(self.cardh, [70, 70])
+        self.cardd = pygame.image.load("defensive_back.png")
+        self.cardd = pygame.transform.scale(self.cardd, [90, 150])
+        self.cardsp = pygame.image.load("special_back.png")
+        self.cardsp = pygame.transform.scale(self.cardsp, [90, 150])
+        self.cardh = pygame.image.load("help_back.png")
+        self.cardh = pygame.transform.scale(self.cardh, [90, 150])
         self.attack_cards_choice = None
 
     def draw (self,screen):
         if self.game.turn_number >=2:
-            screen.blit(self.carda,(width*0.82,heigth*0.04))
-            screen.blit(self.carda, (width * 0.92, heigth * 0.04))
-            screen.blit(self.carda, (width * 0.82, heigth * 0.28))
-            screen.blit(self.carda, (width * 0.92, heigth * 0.28))
+            screen.blit(self.cardat,(width*0.82,heigth*0.04))
+            screen.blit(self.cardd, (width * 0.92, heigth * 0.04))
+            screen.blit(self.cardh, (width * 0.82, heigth * 0.28))
+            screen.blit(self.cardsp, (width * 0.92, heigth * 0.28))
 
     def attack_cards(self):
-        attackcards = [self.carda1,self.carda2]
+        attackcards = [self.carda1]
         self.attack_cards_choice = random.choice(attackcards)
-
 
 def mouse_button_pressed(x, y, w, h, screen, image_original, events, action=None):
     screen.blit(image_original, [x, y])
@@ -632,12 +755,6 @@ def run():
     game = Game()
     game.loop_of_game()
 run()
-
-
-# def collision():
-#     if self.ship4.lead_y  > self.ship1.lead_y + self.ship1.height:
-#         pass
-
 
 
 
