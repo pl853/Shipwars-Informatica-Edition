@@ -10,6 +10,7 @@ heigth = 720
 size = (width, heigth)
 
 class Game:
+
     def __init__(self):
         pygame.init()
         self.turn= Turn()
@@ -160,6 +161,7 @@ class IntroGame:
         self.hoover1 = pygame.transform.scale(self.hoover, [250, 80])
         self.previeuwgame = pygame.image.load("previeuwgame1.png")
         self.previeuwgame = pygame.transform.scale(self.previeuwgame, [500, 300])
+        play_menu_sound("intro.wav", 44100, -16, 2, 4096)
 
     def draw(self,screen):
         mouse = pygame.mouse.get_pos()
@@ -182,6 +184,7 @@ class IntroGame:
         if width/20 + 250 > mouse[0] > width/20 and heigth/1.2 + 50 > mouse[1] > heigth/1.2:
             screen.blit (self.hoover, [width/24,heigth/1.2])
 
+
 class GameMain:
     def __init__(self, game , turn , cards):
         self.button_test = False
@@ -190,6 +193,7 @@ class GameMain:
         self.min_health = False
         self.block_size = 32.8
         self.block_size_up_down = 33.333
+
         self.pause_menu = PauseMenu
         self.game = game
         self.turn= turn
@@ -235,12 +239,12 @@ class GameMain:
         self.attack_button = pygame.transform.scale(self.attack_button,[50,50])
 
 
-
     def update(self):
         keys = pygame.key.get_pressed()
         if self.game.state == self.game.game_main:
             if keys[pygame.K_ESCAPE]:
                 self.game.set_state(self.game.pause_menu)
+
 
             if self.button_test:
                 self.game.ship1.feul = 99
@@ -650,6 +654,7 @@ class PauseMenu:
         self.bmenu = pygame.image.load("button_menu.png")
         self.bmenu = pygame.transform.scale(self.bmenu, [250,50])
 
+
     def draw(self, screen):
         screen.blit(self.title, (width*0.25, heigth*0.15))
         mouse_button_pressed(width*0.4, heigth*0.5, 250, 50, screen, self.pbuttom,self.game.events,
@@ -730,6 +735,8 @@ def mouse_button_pressed(x, y, w, h, screen, image_original, events, action=None
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP and action != None:
                 action()
+                play_click("click.wav", 44100, -16, 2, 4096)
+
 
 def text_objects(text,font):
     textSurface = font.render (text,True, (250,0,0))
@@ -740,6 +747,21 @@ def message_to_screen(text,screen,x,y,size):
     textsuf , textrect = text_objects(text,largeText)
     textrect.center = ((x),(y))
     screen.blit(textsuf,textrect)
+
+
+def play_menu_sound(filename,freq,size,channels,buffersize):
+    pygame.mixer.pre_init(freq, -16, 1, 4096)
+    pygame.mixer.music.load(filename)
+    pygame.mixer.music.play(-1,0.0)
+
+
+def play_click(filename,freq,size,channels,buffersize):
+    pygame.mixer.pre_init(freq, -16, 2, 4096)
+    pygame.mixer.music.load(filename)
+    pygame.mixer.music.play(0,0.0)
+
+
+pygame.mixer.init(frequency = 44100, size = -16, channels = 1, buffer = 2**12)
 
 def run():
     game = Game()
