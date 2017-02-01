@@ -16,8 +16,6 @@ def instructionPage():
     nextb = pygame.image.load("C:/Users/gebruiker/Downloads/21828-200.png")
     backb = pygame.image.load("C:/Users/gebruiker/Downloads/backb.png")
     bg = pygame.image.load("C:/Users/gebruiker/Downloads/bg2.jpg")
-    boat1 = pygame.image.load("C:/Users/gebruiker/Downloads/project2/5M0o1au.png")
-    boat2 = pygame.image.load("C:/Users/gebruiker/Downloads/project2/CNCTW_Nod_Battleship_Top.png")
     mb = pygame.image.load("C:/Users/gebruiker/Desktop/movebutton.png")
     defend = pygame.image.load("C:/Users/gebruiker/Desktop/defence.png")
     attack = pygame.image.load("C:/Users/gebruiker/Desktop/attack.png")
